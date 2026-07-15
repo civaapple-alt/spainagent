@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 type RoleId =
   | "gk"
@@ -315,12 +315,16 @@ export function TacticsLab() {
     const to = line.to === "ball" ? phase.ball : phase.positions[line.to];
     const dx = to.x - from.x;
     const dy = (to.y - from.y) / 1.78;
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
     return {
       left: `${from.x}%`,
       top: `${from.y}%`,
       width: `${Math.sqrt(dx * dx + dy * dy)}%`,
-      transform: `rotate(${Math.atan2(dy, dx) * 180 / Math.PI}deg)`,
-    };
+      "--line-angle": `${angle}deg`,
+      "--line-counter-angle": `${-angle}deg`,
+      "--line-start": line.from === "ball" ? "12px" : "clamp(17px, 2vw, 22px)",
+      "--line-end": line.to === "ball" ? "12px" : "clamp(17px, 2vw, 22px)",
+    } as CSSProperties;
   };
 
   return (
@@ -435,6 +439,7 @@ export function TacticsLab() {
                 style={getLineStyle(line)}
                 aria-hidden="true"
               >
+                <i className="tactical-stroke" />
                 <span>{line.label}</span>
               </div>
             ))}
