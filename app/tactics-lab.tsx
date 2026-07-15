@@ -296,9 +296,14 @@ export function TacticsLab() {
   const [speed, setSpeed] = useState(1);
   const [showOpponents, setShowOpponents] = useState(true);
   const [showLines, setShowLines] = useState(true);
+  const [showVision, setShowVision] = useState(true);
+  const [showDefensiveZone, setShowDefensiveZone] = useState(true);
+  const [showProgressRoute, setShowProgressRoute] = useState(true);
   const phase = phases[phaseIndex];
   const role = roles[selectedRole];
   const phaseDuration = 5600 / speed;
+  const isDefensivePhase = phase.id === "press" || phase.id === "defend";
+  const isPossessionPhase = phase.id === "build" || phase.id === "progress" || phase.id === "attack";
 
   useEffect(() => {
     if (!playing) return;
@@ -310,6 +315,44 @@ export function TacticsLab() {
   }, [playing, phaseDuration]);
 
   const orderedRoles = useMemo(() => Object.keys(roles) as RoleId[], []);
+  const selectedPosition = phase.positions[selectedRole];
+  const angleBetween = (from: Position, to: Position) => {
+    const dx = to.x - from.x;
+    const dy = (to.y - from.y) / 1.78;
+    return Math.atan2(dy, dx) * 180 / Math.PI;
+  };
+  const getVisionAngle = () => {
+    if (isDefensivePhase) return angleBetween(selectedPosition, phase.ball);
+    const ballDx = phase.ball.x - selectedPosition.x;
+    const ballDy = (phase.ball.y - selectedPosition.y) / 1.78;
+    const distance = Math.sqrt(ballDx * ballDx + ballDy * ballDy) || 1;
+    const scanBias = role.group === "中场" ? 1.15 : role.group === "后卫" || role.group === "门将" ? 1.35 : 1;
+    return Math.atan2(ballDy / distance, ballDx / distance + scanBias) * 180 / Math.PI;
+  };
+  const visionAngle = getVisionAngle();
+  const visionStyle = {
+    left: `${selectedPosition.x}%`,
+    top: `${selectedPosition.y}%`,
+    "--vision-angle": `${visionAngle}deg`,
+    "--vision-counter-angle": `${-visionAngle}deg`,
+  } as CSSProperties;
+  const getProgressRouteStyle = () => {
+    const advance = role.group === "门将" ? 15 : role.group === "后卫" ? 23 : role.group === "中场" ? 20 : 13;
+    const target = {
+      x: Math.min(95, selectedPosition.x + advance),
+      y: selectedPosition.y + (50 - selectedPosition.y) * (role.group === "前锋" ? 0.08 : 0.2),
+    };
+    const dx = target.x - selectedPosition.x;
+    const dy = (target.y - selectedPosition.y) / 1.78;
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    return {
+      left: `${selectedPosition.x}%`,
+      top: `${selectedPosition.y}%`,
+      width: `${Math.sqrt(dx * dx + dy * dy)}%`,
+      "--route-angle": `${angle}deg`,
+      "--route-counter-angle": `${-angle}deg`,
+    } as CSSProperties;
+  };
   const getLineStyle = (line: TacticalLine) => {
     const from = line.from === "ball" ? phase.ball : phase.positions[line.from];
     const to = line.to === "ball" ? phase.ball : phase.positions[line.to];
@@ -420,6 +463,31 @@ export function TacticsLab() {
               <span><small>纵深</small><b>{phase.metrics.length}</b></span>
               <span><small>身后保护</small><b>{phase.metrics.protection}</b></span>
             </div>
+            <div className="guidance-controls" aria-label="球员指导图层">
+              <span>指导模型 · {role.label}</span>
+              <div>
+                <button onClick={() => setShowVision((value) => !value)} aria-pressed={showVision}>视角</button>
+                <button onClick={() => setShowDefensiveZone((value) => !value)} aria-pressed={showDefensiveZone} disabled={!isDefensivePhase}>防区</button>
+                <button onClick={() => setShowProgressRoute((value) => !value)} aria-pressed={showProgressRoute} disabled={!isPossessionPhase}>推进</button>
+              </div>
+            </div>
+
+            {showVision && (
+              <div className={`vision-cone ${role.group}`} style={visionStyle} aria-hidden="true">
+                <span>主要视角</span>
+              </div>
+            )}
+            {showDefensiveZone && isDefensivePhase && (
+              <div className={`defensive-zone ${role.group}`} style={visionStyle} aria-hidden="true">
+                <span>防守责任区</span>
+              </div>
+            )}
+            {showProgressRoute && isPossessionPhase && (
+              <div className="progress-corridor" style={getProgressRouteStyle()} aria-hidden="true">
+                <i />
+                <span>首选推进走廊</span>
+              </div>
+            )}
 
             {showOpponents && phase.opponents.map((position, index) => (
               <div
