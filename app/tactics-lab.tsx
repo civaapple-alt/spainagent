@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 type RoleId =
   | "gk"
@@ -290,6 +290,7 @@ const formations = [
 ];
 
 export function TacticsLab() {
+  const pitchStageRef = useRef<HTMLDivElement>(null);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [selectedRole, setSelectedRole] = useState<RoleId>("dm");
   const [playing, setPlaying] = useState(true);
@@ -299,6 +300,7 @@ export function TacticsLab() {
   const [showVision, setShowVision] = useState(true);
   const [showDefensiveZone, setShowDefensiveZone] = useState(true);
   const [showProgressRoute, setShowProgressRoute] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const phase = phases[phaseIndex];
   const role = roles[selectedRole];
   const phaseDuration = 5600 / speed;
@@ -313,6 +315,21 @@ export function TacticsLab() {
     );
     return () => window.clearInterval(timer);
   }, [playing, phaseDuration]);
+
+  useEffect(() => {
+    const syncFullscreenState = () => setIsFullscreen(document.fullscreenElement === pitchStageRef.current);
+    document.addEventListener("fullscreenchange", syncFullscreenState);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreenState);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await pitchStageRef.current?.requestFullscreen();
+    } catch {
+      setIsFullscreen(false);
+    }
+  };
 
   const orderedRoles = useMemo(() => Object.keys(roles) as RoleId[], []);
   const selectedPosition = phase.positions[selectedRole];
@@ -403,6 +420,7 @@ export function TacticsLab() {
 
       <section className="workspace" aria-label="西班牙动态战术演示">
         <div className="board-column">
+          <div className="pitch-stage" ref={pitchStageRef}>
           <div className="board-toolbar">
             <div className="phase-tabs" role="tablist" aria-label="攻防阶段">
               {phases.map((item, index) => (
@@ -429,6 +447,9 @@ export function TacticsLab() {
               </button>
               <button className="speed-button" onClick={() => setSpeed((value) => value === 1 ? 1.5 : value === 1.5 ? 0.75 : 1)} aria-label="切换播放速度">
                 {speed}×
+              </button>
+              <button className="fullscreen-button" onClick={toggleFullscreen} aria-label={isFullscreen ? "退出球场全屏" : "球场全屏显示"} title={isFullscreen ? "退出全屏" : "全屏显示"}>
+                <b>{isFullscreen ? "×" : "⛶"}</b><span>{isFullscreen ? "退出" : "全屏"}</span>
               </button>
             </div>
             <div
@@ -535,6 +556,7 @@ export function TacticsLab() {
                 </button>
               );
             })}
+          </div>
           </div>
 
           <div className="phase-progress" aria-label="当前战术阶段">
