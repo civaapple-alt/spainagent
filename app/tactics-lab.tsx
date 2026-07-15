@@ -17,6 +17,14 @@ type RoleId =
 
 type Position = { x: number; y: number };
 
+type LineAnchor = RoleId | "ball";
+type TacticalLine = {
+  from: LineAnchor;
+  to: LineAnchor;
+  type: "pass" | "run" | "press" | "cover";
+  label: string;
+};
+
 type Phase = {
   id: string;
   short: string;
@@ -27,6 +35,9 @@ type Phase = {
   instruction: string;
   ball: Position;
   focus: RoleId[];
+  metrics: { width: string; length: string; protection: string };
+  lines: TacticalLine[];
+  opponents: Position[];
   positions: Record<RoleId, Position>;
 };
 
@@ -149,14 +160,24 @@ const phases: Phase[] = [
     short: "01",
     title: "后场组织",
     eyebrow: "持球 · 第一阶段",
-    description: "门将与中卫拉开宽度，后腰回到第一压迫线之后接球，主动邀请对手向前。",
-    shape: "2-3 出球底座",
-    instruction: "耐心吸引，再越过第一线",
-    ball: { x: 20, y: 44 },
-    focus: ["gk", "lcb", "rcb", "dm"],
+    description: "左后卫内收形成三人底座，右后卫保持较高宽度。后腰在第一压迫线身后移动接应，建立不对称出球。",
+    shape: "3-2 非对称出球",
+    instruction: "一侧稳住结构，另一侧拉开出口",
+    ball: { x: 22, y: 43 },
+    focus: ["gk", "lb", "lcb", "rcb", "dm"],
+    metrics: { width: "72m", length: "56m", protection: "3+2" },
+    lines: [
+      { from: "gk", to: "lcb", type: "pass", label: "引出第一压迫" },
+      { from: "lcb", to: "dm", type: "pass", label: "穿过第一线" },
+      { from: "dm", to: "am", type: "pass", label: "向前找到自由人" },
+    ],
+    opponents: [
+      { x: 92, y: 50 }, { x: 82, y: 15 }, { x: 81, y: 38 }, { x: 81, y: 62 }, { x: 82, y: 85 },
+      { x: 65, y: 24 }, { x: 63, y: 50 }, { x: 65, y: 76 }, { x: 50, y: 27 }, { x: 48, y: 50 }, { x: 50, y: 73 },
+    ],
     positions: {
-      gk: { x: 8, y: 50 }, lb: { x: 28, y: 13 }, lcb: { x: 24, y: 36 }, rcb: { x: 24, y: 64 }, rb: { x: 28, y: 87 },
-      dm: { x: 39, y: 50 }, lcm: { x: 48, y: 31 }, am: { x: 51, y: 67 }, lw: { x: 60, y: 12 }, st: { x: 61, y: 50 }, rw: { x: 60, y: 88 },
+      gk: { x: 8, y: 50 }, lb: { x: 28, y: 20 }, lcb: { x: 26, y: 41 }, rcb: { x: 26, y: 67 }, rb: { x: 41, y: 86 },
+      dm: { x: 41, y: 51 }, lcm: { x: 50, y: 32 }, am: { x: 55, y: 68 }, lw: { x: 61, y: 11 }, st: { x: 62, y: 50 }, rw: { x: 62, y: 90 },
     },
   },
   {
@@ -164,14 +185,24 @@ const phases: Phase[] = [
     short: "02",
     title: "中场推进",
     eyebrow: "持球 · 第二阶段",
-    description: "后腰决定转移方向，两名中场占据不同高度，边后卫开始越过中场线。",
+    description: "左后卫留在三后卫底座，右后卫与后腰组成推进双支点；前方五人分别占据边路、肋部与中央通道。",
     shape: "3-2-5 动态站位",
-    instruction: "用宽度拉开，再从肋部穿过",
-    ball: { x: 48, y: 57 },
-    focus: ["dm", "lcm", "am", "rb"],
+    instruction: "三人保护身后，双支点选择推进方向",
+    ball: { x: 50, y: 52 },
+    focus: ["dm", "rb", "lcm", "am"],
+    metrics: { width: "76m", length: "48m", protection: "3+2" },
+    lines: [
+      { from: "rcb", to: "dm", type: "pass", label: "进入中轴" },
+      { from: "dm", to: "rb", type: "pass", label: "转向强侧" },
+      { from: "lcm", to: "lw", type: "run", label: "左肋前插" },
+    ],
+    opponents: [
+      { x: 93, y: 50 }, { x: 81, y: 15 }, { x: 79, y: 38 }, { x: 79, y: 62 }, { x: 81, y: 85 },
+      { x: 65, y: 22 }, { x: 64, y: 50 }, { x: 65, y: 78 }, { x: 57, y: 25 }, { x: 55, y: 50 }, { x: 57, y: 75 },
+    ],
     positions: {
-      gk: { x: 12, y: 50 }, lb: { x: 43, y: 15 }, lcb: { x: 32, y: 37 }, rcb: { x: 31, y: 63 }, rb: { x: 48, y: 84 },
-      dm: { x: 47, y: 48 }, lcm: { x: 58, y: 31 }, am: { x: 61, y: 65 }, lw: { x: 69, y: 12 }, st: { x: 71, y: 49 }, rw: { x: 70, y: 89 },
+      gk: { x: 15, y: 50 }, lb: { x: 37, y: 20 }, lcb: { x: 34, y: 43 }, rcb: { x: 34, y: 68 }, rb: { x: 53, y: 76 },
+      dm: { x: 51, y: 46 }, lcm: { x: 67, y: 30 }, am: { x: 69, y: 69 }, lw: { x: 72, y: 10 }, st: { x: 76, y: 50 }, rw: { x: 73, y: 90 },
     },
   },
   {
@@ -179,14 +210,24 @@ const phases: Phase[] = [
     short: "03",
     title: "进攻落位",
     eyebrow: "持球 · 终结阶段",
-    description: "五人占满前场通道。中锋回撤牵制，前腰与右后卫在亚马尔式边锋身边形成连续配合。",
-    shape: "前场五通道",
-    instruction: "一侧吸引，弱侧终结",
-    ball: { x: 78, y: 77 },
+    description: "前场五人严格占据五条纵向通道。右后卫从双支点位置延后前插，左后卫继续留在三人保护底座。",
+    shape: "3-2-5 五通道",
+    instruction: "先固定五通道，再允许右后卫成为第六人",
+    ball: { x: 78, y: 84 },
     focus: ["rw", "rb", "am", "st"],
+    metrics: { width: "78m", length: "43m", protection: "3+2" },
+    lines: [
+      { from: "rw", to: "am", type: "pass", label: "边锋回做" },
+      { from: "am", to: "rb", type: "run", label: "右后卫后插上" },
+      { from: "lcm", to: "st", type: "run", label: "攻击中锋身侧" },
+    ],
+    opponents: [
+      { x: 94, y: 50 }, { x: 85, y: 14 }, { x: 83, y: 38 }, { x: 83, y: 62 }, { x: 85, y: 86 },
+      { x: 72, y: 22 }, { x: 71, y: 50 }, { x: 72, y: 78 }, { x: 65, y: 28 }, { x: 64, y: 50 }, { x: 65, y: 72 },
+    ],
     positions: {
-      gk: { x: 16, y: 50 }, lb: { x: 55, y: 14 }, lcb: { x: 38, y: 36 }, rcb: { x: 38, y: 64 }, rb: { x: 72, y: 77 },
-      dm: { x: 52, y: 50 }, lcm: { x: 67, y: 33 }, am: { x: 73, y: 62 }, lw: { x: 79, y: 10 }, st: { x: 82, y: 47 }, rw: { x: 81, y: 90 },
+      gk: { x: 18, y: 50 }, lb: { x: 40, y: 19 }, lcb: { x: 40, y: 43 }, rcb: { x: 40, y: 68 }, rb: { x: 62, y: 78 },
+      dm: { x: 55, y: 49 }, lcm: { x: 76, y: 30 }, am: { x: 77, y: 69 }, lw: { x: 80, y: 9 }, st: { x: 83, y: 50 }, rw: { x: 80, y: 91 },
     },
   },
   {
@@ -194,14 +235,24 @@ const phases: Phase[] = [
     short: "04",
     title: "高位反抢",
     eyebrow: "转换 · 丢球瞬间",
-    description: "最近的球员立即围堵持球者，后腰前移封锁向中锋的直传，中卫同步压缩纵向距离。",
+    description: "丢球点附近三人立即围堵，后腰封锁向中锋的直传，右中卫向前保护反抢圈；门将同步前移清理身后。",
     shape: "五秒反抢圈",
-    instruction: "先封中路，再逼向边线",
+    instruction: "三人压球、两人封口；五秒失败立即回收",
     ball: { x: 70, y: 55 },
-    focus: ["dm", "lcm", "am", "st", "rw"],
+    focus: ["dm", "lcm", "am", "st", "rcb"],
+    metrics: { width: "62m", length: "32m", protection: "3+2" },
+    lines: [
+      { from: "st", to: "ball", type: "press", label: "直接压迫" },
+      { from: "am", to: "ball", type: "press", label: "夹击持球人" },
+      { from: "dm", to: "ball", type: "cover", label: "封锁中路出口" },
+    ],
+    opponents: [
+      { x: 93, y: 50 }, { x: 82, y: 14 }, { x: 80, y: 37 }, { x: 80, y: 63 }, { x: 82, y: 86 },
+      { x: 70, y: 24 }, { x: 70, y: 55 }, { x: 69, y: 78 }, { x: 58, y: 26 }, { x: 57, y: 50 }, { x: 58, y: 74 },
+    ],
     positions: {
-      gk: { x: 18, y: 50 }, lb: { x: 49, y: 16 }, lcb: { x: 45, y: 38 }, rcb: { x: 45, y: 62 }, rb: { x: 55, y: 82 },
-      dm: { x: 57, y: 49 }, lcm: { x: 65, y: 34 }, am: { x: 68, y: 62 }, lw: { x: 72, y: 15 }, st: { x: 76, y: 48 }, rw: { x: 75, y: 84 },
+      gk: { x: 29, y: 50 }, lb: { x: 48, y: 18 }, lcb: { x: 46, y: 40 }, rcb: { x: 48, y: 64 }, rb: { x: 57, y: 82 },
+      dm: { x: 58, y: 50 }, lcm: { x: 66, y: 35 }, am: { x: 69, y: 62 }, lw: { x: 72, y: 14 }, st: { x: 75, y: 49 }, rw: { x: 74, y: 87 },
     },
   },
   {
@@ -209,14 +260,24 @@ const phases: Phase[] = [
     short: "05",
     title: "低位防守",
     eyebrow: "无球 · 阵地防守",
-    description: "两侧边锋回到中场线，前腰上提到中锋身边，阵型由4-1-2-3收缩为紧凑4-4-2。",
-    shape: "4-4-2 防守块",
-    instruction: "保持横向紧凑，保护禁区中央",
-    ball: { x: 67, y: 20 },
-    focus: ["lb", "lcb", "rcb", "rb", "dm"],
+    description: "反抢失败后，两侧边锋回到中场线，前腰上提到中锋身边，阵型退入紧凑4-4-2中低位防守块。",
+    shape: "4-4-2 中低位块",
+    instruction: "前锋封后腰，四中场横移保护禁区中央",
+    ball: { x: 58, y: 18 },
+    focus: ["lb", "lcb", "rcb", "rb", "dm", "lw", "rw"],
+    metrics: { width: "44m", length: "28m", protection: "4+4" },
+    lines: [
+      { from: "lw", to: "lb", type: "cover", label: "边锋回收到位" },
+      { from: "rw", to: "rb", type: "cover", label: "封闭弱侧" },
+      { from: "dm", to: "ball", type: "cover", label: "保护禁区中央" },
+    ],
+    opponents: [
+      { x: 92, y: 50 }, { x: 78, y: 14 }, { x: 77, y: 38 }, { x: 77, y: 62 }, { x: 78, y: 86 },
+      { x: 60, y: 18 }, { x: 58, y: 48 }, { x: 60, y: 82 }, { x: 44, y: 25 }, { x: 43, y: 50 }, { x: 44, y: 75 },
+    ],
     positions: {
-      gk: { x: 8, y: 50 }, lb: { x: 25, y: 17 }, lcb: { x: 23, y: 39 }, rcb: { x: 23, y: 61 }, rb: { x: 25, y: 83 },
-      dm: { x: 39, y: 43 }, lcm: { x: 39, y: 65 }, am: { x: 48, y: 58 }, lw: { x: 38, y: 17 }, st: { x: 50, y: 42 }, rw: { x: 39, y: 84 },
+      gk: { x: 8, y: 50 }, lb: { x: 21, y: 18 }, lcb: { x: 20, y: 40 }, rcb: { x: 20, y: 61 }, rb: { x: 21, y: 82 },
+      dm: { x: 34, y: 42 }, lcm: { x: 34, y: 64 }, am: { x: 45, y: 58 }, lw: { x: 34, y: 18 }, st: { x: 46, y: 42 }, rw: { x: 34, y: 83 },
     },
   },
 ];
@@ -233,19 +294,34 @@ export function TacticsLab() {
   const [selectedRole, setSelectedRole] = useState<RoleId>("dm");
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState(1);
+  const [showOpponents, setShowOpponents] = useState(true);
+  const [showLines, setShowLines] = useState(true);
   const phase = phases[phaseIndex];
   const role = roles[selectedRole];
+  const phaseDuration = 5600 / speed;
 
   useEffect(() => {
     if (!playing) return;
     const timer = window.setInterval(
       () => setPhaseIndex((current) => (current + 1) % phases.length),
-      2800 / speed,
+      phaseDuration,
     );
     return () => window.clearInterval(timer);
-  }, [playing, speed]);
+  }, [playing, phaseDuration]);
 
   const orderedRoles = useMemo(() => Object.keys(roles) as RoleId[], []);
+  const getLineStyle = (line: TacticalLine) => {
+    const from = line.from === "ball" ? phase.ball : phase.positions[line.from];
+    const to = line.to === "ball" ? phase.ball : phase.positions[line.to];
+    const dx = to.x - from.x;
+    const dy = (to.y - from.y) / 1.78;
+    return {
+      left: `${from.x}%`,
+      top: `${from.y}%`,
+      width: `${Math.sqrt(dx * dx + dy * dy)}%`,
+      transform: `rotate(${Math.atan2(dy, dx) * 180 / Math.PI}deg)`,
+    };
+  };
 
   return (
     <main className="app-shell">
@@ -295,6 +371,12 @@ export function TacticsLab() {
               ))}
             </div>
             <div className="playback">
+              <button className="layer-button" onClick={() => setShowOpponents((value) => !value)} aria-pressed={showOpponents} aria-label="显示或隐藏对手站位">
+                对手 <b>{showOpponents ? "开" : "关"}</b>
+              </button>
+              <button className="layer-button" onClick={() => setShowLines((value) => !value)} aria-pressed={showLines} aria-label="显示或隐藏战术线路">
+                线路 <b>{showLines ? "开" : "关"}</b>
+              </button>
               <button className="play-button" onClick={() => setPlaying((value) => !value)} aria-label={playing ? "暂停战术演示" : "播放战术演示"}>
                 {playing ? "Ⅱ" : "▶"}
               </button>
@@ -302,6 +384,11 @@ export function TacticsLab() {
                 {speed}×
               </button>
             </div>
+            <div
+              key={`${phase.id}-${playing}-${speed}`}
+              className={`auto-timer ${playing ? "running" : ""}`}
+              style={{ animationDuration: `${phaseDuration}ms` }}
+            />
           </div>
 
           <div className={`pitch phase-${phase.id}`}>
@@ -318,6 +405,39 @@ export function TacticsLab() {
             <div className="zone-label own">组织区</div>
             <div className="zone-label middle">推进区</div>
             <div className="zone-label final">终结区</div>
+
+            <div className="live-coach">
+              <span>LIVE COACH · 0{phaseIndex + 1}</span>
+              <strong>{phase.shape}</strong>
+              <small>{phase.instruction}</small>
+            </div>
+            <div className="pitch-metrics" aria-label="当前阵型战术指标">
+              <span><small>宽度</small><b>{phase.metrics.width}</b></span>
+              <span><small>纵深</small><b>{phase.metrics.length}</b></span>
+              <span><small>身后保护</small><b>{phase.metrics.protection}</b></span>
+            </div>
+
+            {showOpponents && phase.opponents.map((position, index) => (
+              <div
+                key={`opponent-${index}`}
+                className="opponent-node"
+                style={{ left: `${position.x}%`, top: `${position.y}%` }}
+                aria-hidden="true"
+              >
+                <span>{index === 0 ? "GK" : index}</span>
+              </div>
+            ))}
+
+            {showLines && phase.lines.map((line, index) => (
+              <div
+                key={`${phase.id}-${line.type}-${index}`}
+                className={`tactical-line ${line.type}`}
+                style={getLineStyle(line)}
+                aria-hidden="true"
+              >
+                <span>{line.label}</span>
+              </div>
+            ))}
 
             <div className="focus-halo" style={{ left: `${phase.ball.x}%`, top: `${phase.ball.y}%` }} />
             <div className="ball" style={{ left: `${phase.ball.x}%`, top: `${phase.ball.y}%` }} aria-label="足球位置"><span /></div>
@@ -355,12 +475,18 @@ export function TacticsLab() {
                 </button>
               ))}
             </div>
+            <div className="pitch-legend" aria-label="战术线路图例">
+              <span><i className="pass" />传球</span>
+              <span><i className="run" />跑动</span>
+              <span><i className="press" />压迫</span>
+              <span><i className="cover" />保护</span>
+            </div>
           </div>
         </div>
 
         <aside className="analysis-panel">
           <div className="panel-heading">
-            <span>COACH'S BOARD</span>
+            <span>COACH&apos;S BOARD</span>
             <strong>教练战术安排</strong>
           </div>
 
