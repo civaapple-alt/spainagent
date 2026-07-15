@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { AnalysisPanel } from "./tactics/components/AnalysisPanel";
 import { PhaseProgress } from "./tactics/components/PhaseProgress";
 import { PitchStage } from "./tactics/components/PitchStage";
-import { plannedResearchTeams, teamCatalog } from "./tactics/data/catalog";
+import { plannedResearchTeams, readyTeams, teamCatalog } from "./tactics/data/catalog";
 import { spainTeam } from "./tactics/data/spain";
 import type { SlotId } from "./tactics/types";
 
 export function TacticsLab() {
-  const team = teamCatalog.find((entry) => entry.id === "ESP")?.definition ?? spainTeam;
+  const [teamId, setTeamId] = useState("ESP");
+  const team = teamCatalog.find((entry) => entry.id === teamId)?.definition ?? spainTeam;
   const sequence = team.sequences[0];
   const frames = sequence.frames;
   const [phaseIndex, setPhaseIndex] = useState(0);
@@ -23,7 +24,8 @@ export function TacticsLab() {
   const [showProgressRoute, setShowProgressRoute] = useState(true);
   const frame = frames[phaseIndex];
   const teamFrame = frame.teams[team.id];
-  const selectedNode = teamFrame.nodes[selectedSlotId];
+  const selectedNode = teamFrame.nodes[selectedSlotId] ?? teamFrame.nodes[team.roleOrder[0]];
+  const activeSlotId = selectedNode.slotId;
   const selectedRole = team.roles[selectedNode.roleId];
   const phaseDuration = 5600 / speed;
 
@@ -41,6 +43,15 @@ export function TacticsLab() {
     setPlaying(false);
   };
 
+  const changeTeam = (nextTeamId: string) => {
+    const nextTeam = teamCatalog.find((entry) => entry.id === nextTeamId)?.definition;
+    if (!nextTeam) return;
+    setTeamId(nextTeamId);
+    setPhaseIndex(0);
+    setSelectedSlotId(nextTeam.roles.dm ? "dm" : nextTeam.roleOrder[0]);
+    setPlaying(false);
+  };
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -50,7 +61,7 @@ export function TacticsLab() {
         </a>
         <nav className="main-nav" aria-label="主导航">
           <button className="nav-item active">战术演示</button>
-          <button className="nav-item" disabled>世界杯球队 <span>{plannedResearchTeams.length} 待研究</span></button>
+          <button className="nav-item" onClick={() => document.getElementById("team-switcher")?.scrollIntoView({ behavior: "smooth" })}>世界杯球队 <span>{readyTeams.length} 已完成</span></button>
           <button className="nav-item" disabled>阵型资料库 <span>后续</span></button>
         </nav>
         <div className="edition"><i /> 2026 世界杯 · 阶段一</div>
@@ -62,10 +73,19 @@ export function TacticsLab() {
           <h1>看见阵型，<em>如何真正移动。</em></h1>
           <p className="hero-description">从位置职责出发，拆解球队在持球、转换与防守中的整体移动。这里没有球星卡，只有教练想让每个位置完成的任务。</p>
         </div>
-        <div className="team-card">
-          <div className="flag" style={{ background: team.flagBackground }} aria-hidden="true"><span /></div>
-          <div><small>当前球队</small><strong>{team.name}</strong></div>
-          <div className="team-meta"><span>{team.code}</span><span>{team.baseFormation}</span></div>
+        <div className="team-controls" id="team-switcher">
+          <div className="team-card">
+            <div className="flag" style={{ background: team.flagBackground }} aria-hidden="true"><span /></div>
+            <div><small>当前球队</small><strong>{team.name}</strong></div>
+            <div className="team-meta"><span>{team.code}</span><span>{team.baseFormation}</span></div>
+          </div>
+          <div className="team-switcher" aria-label="切换已完成研究的球队">
+            {readyTeams.map((entry) => (
+              <button key={entry.id} className={entry.id === team.id ? "active" : ""} onClick={() => changeTeam(entry.id)} aria-pressed={entry.id === team.id}>
+                {entry.code} · {entry.name}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -76,7 +96,7 @@ export function TacticsLab() {
             frames={frames}
             frame={frame}
             phaseIndex={phaseIndex}
-            selectedSlotId={selectedSlotId}
+            selectedSlotId={activeSlotId}
             playing={playing}
             speed={speed}
             phaseDuration={phaseDuration}
@@ -101,6 +121,23 @@ export function TacticsLab() {
         <AnalysisPanel team={team} frame={frame} phaseIndex={phaseIndex} role={selectedRole} roleFunction={selectedNode.function} />
       </section>
 
+      {team.research && (
+        <section className="research-summary" aria-label={`${team.name}研究样本`}>
+          <div className="research-heading">
+            <small>RESEARCH BASELINE · {team.research.asOf}</small>
+            <h2>{team.research.tournament} · {team.research.matchSamples.length}场样本</h2>
+            <p>{team.research.scope}。{team.research.methodology}</p>
+          </div>
+          <div className="research-matches">
+            {team.research.matchSamples.map((sample) => (
+              <a key={`${sample.date}-${sample.opponent}`} href={sample.sourceUrl} target="_blank" rel="noreferrer">
+                <small>{sample.stage}</small><strong>{sample.opponent} <b>{sample.score}</b></strong><span>{sample.observedFormation}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="principles">
         <div className="section-lead">
           <span>{team.name} · 战术原则</span>
@@ -116,7 +153,7 @@ export function TacticsLab() {
 
       <footer>
         <div><strong>TACTICA</strong><span>可扩展战术引擎 · 当前 {team.name}</span></div>
-        <p>待研究：{plannedResearchTeams.map((item) => item.name).join(" · ")} · 多队对抗</p>
+        <p>已完成：{readyTeams.map((item) => item.name).join(" · ")} · 待研究：{plannedResearchTeams.map((item) => item.name).join(" · ")} · 对抗模拟下一阶段</p>
       </footer>
     </main>
   );

@@ -1,9 +1,10 @@
 import type { MatchupCatalogEntry, TeamCatalogEntry } from "../types";
+import { franceTeam } from "./france";
 import { spainTeam } from "./spain";
 
 export const teamCatalog: TeamCatalogEntry[] = [
   { id: "ESP", slug: "spain", name: "西班牙", nameEn: "SPAIN", code: "ESP", status: "ready", definition: spainTeam },
-  { id: "FRA", slug: "france", name: "法国", nameEn: "FRANCE", code: "FRA", status: "research-planned" },
+  { id: "FRA", slug: "france", name: "法国", nameEn: "FRANCE", code: "FRA", status: "ready", definition: franceTeam },
   { id: "ENG", slug: "england", name: "英格兰", nameEn: "ENGLAND", code: "ENG", status: "research-planned" },
   { id: "ARG", slug: "argentina", name: "阿根廷", nameEn: "ARGENTINA", code: "ARG", status: "research-planned" },
 ];

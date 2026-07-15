@@ -150,6 +150,26 @@ export type TacticalPrinciple = {
   description: string;
 };
 
+export type ResearchMatchSample = {
+  date: string;
+  stage: string;
+  opponent: string;
+  score: string;
+  observedFormation: string;
+  evidence: string[];
+  sourceUrl: string;
+};
+
+export type TeamResearch = {
+  tournament: string;
+  coach: string;
+  asOf: string;
+  scope: string;
+  methodology: string;
+  squadSourceUrl: string;
+  matchSamples: ResearchMatchSample[];
+};
+
 export type TeamDefinition = {
   id: TeamId;
   slug: string;
@@ -164,6 +184,7 @@ export type TeamDefinition = {
   formations: FormationDefinition[];
   principles: TacticalPrinciple[];
   sequences: TacticalSequence[];
+  research?: TeamResearch;
 };
 
 export type TeamCatalogEntry = {
