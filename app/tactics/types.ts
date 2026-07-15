@@ -129,6 +129,7 @@ export type TacticalFrame = {
   metrics: TacticalMetrics;
   annotations: TacticalAnnotation[];
   teams: Record<TeamId, TeamFrame>;
+  attackDirections?: Record<TeamId, 1 | -1>;
   source: SourceMetadata;
 };
 
@@ -202,5 +203,11 @@ export type MatchupCatalogEntry = {
   homeTeamId: TeamId;
   awayTeamId: TeamId;
   status: "planned" | "researching" | "ready";
+  title?: string;
+  competition?: string;
+  playedAt?: string;
+  score?: { home: number; away: number };
+  summary?: string;
+  sources?: { label: string; url: string }[];
   sequence?: TacticalSequence;
 };

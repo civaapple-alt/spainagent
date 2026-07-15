@@ -38,17 +38,19 @@ export const getVisionStyle = (
   teamId: TeamId,
   slotId: SlotId,
   role: RoleDefinition,
+  faceBall = isDefensiveStage(frame.stage),
 ) => {
   const position = getNodePosition(frame, teamId, slotId);
   let angle: number;
-  if (isDefensiveStage(frame.stage)) {
+  if (faceBall) {
     angle = angleBetween(position, frame.ball);
   } else {
     const ballDx = frame.ball.x - position.x;
     const ballDy = (frame.ball.y - position.y) / PITCH_ASPECT_RATIO;
     const distance = Math.sqrt(ballDx * ballDx + ballDy * ballDy) || 1;
     const scanBias = role.group === "中场" ? 1.15 : role.group === "后卫" || role.group === "门将" ? 1.35 : 1;
-    angle = Math.atan2(ballDy / distance, ballDx / distance + scanBias) * 180 / Math.PI;
+    const attackDirection = frame.attackDirections?.[teamId] ?? 1;
+    angle = Math.atan2(ballDy / distance, ballDx / distance + scanBias * attackDirection) * 180 / Math.PI;
   }
   return {
     left: `${position.x}%`,
@@ -66,8 +68,9 @@ export const getProgressRouteStyle = (
 ) => {
   const position = getNodePosition(frame, teamId, slotId);
   const advance = role.group === "门将" ? 15 : role.group === "后卫" ? 23 : role.group === "中场" ? 20 : 13;
+  const attackDirection = frame.attackDirections?.[teamId] ?? 1;
   const target = {
-    x: Math.min(95, position.x + advance),
+    x: Math.max(5, Math.min(95, position.x + advance * attackDirection)),
     y: position.y + (50 - position.y) * (role.group === "前锋" ? 0.08 : 0.2),
   };
   const dx = target.x - position.x;

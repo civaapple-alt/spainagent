@@ -5,11 +5,9 @@ import {
   getAnnotationStyle,
   getProgressRouteStyle,
   getVisionStyle,
-  isDefensiveStage,
   isFocusedNode,
-  isPossessionStage,
 } from "../geometry";
-import type { SlotId, TacticalFrame, TeamDefinition } from "../types";
+import type { NodeRef, TacticalFrame, TeamDefinition } from "../types";
 
 type PitchStageProps = {
   team: TeamDefinition;
@@ -17,7 +15,7 @@ type PitchStageProps = {
   frames: TacticalFrame[];
   frame: TacticalFrame;
   phaseIndex: number;
-  selectedSlotId: SlotId;
+  selectedNodeRef: NodeRef;
   playing: boolean;
   speed: number;
   phaseDuration: number;
@@ -27,7 +25,7 @@ type PitchStageProps = {
   showDefensiveZone: boolean;
   showProgressRoute: boolean;
   onPhaseChange: (index: number) => void;
-  onSelectSlot: (slotId: SlotId) => void;
+  onSelectNode: (node: NodeRef) => void;
   onTogglePlaying: () => void;
   onCycleSpeed: () => void;
   onToggleOpponents: () => void;
@@ -38,20 +36,24 @@ type PitchStageProps = {
 };
 
 export function PitchStage({
-  team, opponentTeam, frames, frame, phaseIndex, selectedSlotId, playing, speed, phaseDuration,
+  team, opponentTeam, frames, frame, phaseIndex, selectedNodeRef, playing, speed, phaseDuration,
   showOpponents, showLines, showVision, showDefensiveZone, showProgressRoute,
-  onPhaseChange, onSelectSlot, onTogglePlaying, onCycleSpeed, onToggleOpponents, onToggleLines,
+  onPhaseChange, onSelectNode, onTogglePlaying, onCycleSpeed, onToggleOpponents, onToggleLines,
   onToggleVision, onToggleDefensiveZone, onToggleProgressRoute,
 }: PitchStageProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const teamFrame = frame.teams[team.id];
-  const opponentFrame = frame.teams[frame.opponentTeamId];
-  const selectedNode = teamFrame.nodes[selectedSlotId];
-  const selectedRole = team.roles[selectedNode.roleId];
-  const defensive = isDefensiveStage(frame.stage);
-  const possession = isPossessionStage(frame.stage);
-  const visionStyle = getVisionStyle(frame, team.id, selectedSlotId, selectedRole);
+  const opponentFrame = frame.teams[opponentTeam?.id ?? frame.opponentTeamId];
+  const selectedTeam = selectedNodeRef.teamId === opponentTeam?.id ? opponentTeam : team;
+  const selectedTeamFrame = frame.teams[selectedTeam.id] ?? teamFrame;
+  const selectedNode = selectedTeamFrame.nodes[selectedNodeRef.slotId] ?? selectedTeamFrame.nodes[selectedTeam.roleOrder[0]];
+  const activeNodeRef: NodeRef = { kind: "node", teamId: selectedTeam.id, slotId: selectedNode.slotId };
+  const selectedRole = selectedTeam.roles[selectedNode.roleId];
+  const selectedHasPossession = frame.possessionTeamId === selectedTeam.id;
+  const defensive = !selectedHasPossession;
+  const possession = selectedHasPossession;
+  const visionStyle = getVisionStyle(frame, selectedTeam.id, selectedNode.slotId, selectedRole, defensive);
 
   useEffect(() => {
     const sync = () => setIsFullscreen(document.fullscreenElement === stageRef.current);
@@ -118,7 +120,7 @@ export function PitchStage({
           <span><small>身后保护</small><b>{frame.metrics.protection}</b></span>
         </div>
         <div className="guidance-controls" aria-label="球员指导图层">
-          <span>指导模型 · {selectedNode.function?.label ?? selectedRole.label}</span>
+          <span>{selectedTeam.code} 指导模型 · {selectedNode.function?.label ?? selectedRole.label}</span>
           <div>
             <button onClick={onToggleVision} aria-pressed={showVision}>视角</button>
             <button onClick={onToggleDefensiveZone} aria-pressed={showDefensiveZone} disabled={!defensive}>防区</button>
@@ -137,7 +139,7 @@ export function PitchStage({
         <div className="penalty-area right"><span /></div>
         <div className="goal left" />
         <div className="goal right" />
-        <div className="attack-direction">进攻方向 <b>→</b></div>
+        <div className="attack-direction">{opponentTeam ? <><b>{team.code} →</b> · <b>← {opponentTeam.code}</b></> : <>进攻方向 <b>→</b></>}</div>
         <div className="zone-label own">组织区</div>
         <div className="zone-label middle">推进区</div>
         <div className="zone-label final">终结区</div>
@@ -149,19 +151,34 @@ export function PitchStage({
           <div className={`defensive-zone ${selectedRole.group}`} style={visionStyle} aria-hidden="true"><span>防守责任区</span></div>
         )}
         {showProgressRoute && possession && (
-          <div className="progress-corridor" style={getProgressRouteStyle(frame, team.id, selectedSlotId, selectedRole)} aria-hidden="true">
+          <div className="progress-corridor" style={getProgressRouteStyle(frame, selectedTeam.id, selectedNode.slotId, selectedRole)} aria-hidden="true">
             <i /><span>首选推进走廊</span>
           </div>
         )}
 
-        {showOpponents && opponentFrame && Object.values(opponentFrame.nodes).map((node, index) => {
-          const opponentRole = opponentTeam?.roles[node.roleId];
+        {showOpponents && opponentFrame && (opponentTeam ? opponentTeam.roleOrder.map((slotId) => {
+          const node = opponentFrame.nodes[slotId];
+          if (!node) return null;
+          const role = opponentTeam.roles[node.roleId];
+          const focused = isFocusedNode(frame, opponentTeam.id, slotId);
+          const selected = activeNodeRef.teamId === opponentTeam.id && activeNodeRef.slotId === slotId;
           return (
-            <div key={`${opponentFrame.teamId}-${node.slotId}`} className="opponent-node" style={{ left: `${node.position.x}%`, top: `${node.position.y}%` }} aria-hidden="true">
-              <span>{opponentRole?.short ?? (index === 0 ? "GK" : index)}</span>
-            </div>
+            <button
+              key={`${opponentTeam.id}-${slotId}`}
+              className={`player-node away ${role.group} ${focused ? "focused" : ""} ${selected ? "selected" : ""}`}
+              style={{ left: `${node.position.x}%`, top: `${node.position.y}%` }}
+              onClick={() => onSelectNode({ kind: "node", teamId: opponentTeam.id, slotId })}
+              aria-label={`查看${opponentTeam.name}${role.label}的职责`}
+              aria-pressed={selected}
+            >
+              <span className="player-disc">{role.short}</span><span className="player-label">{opponentTeam.code} · {role.label}</span>
+            </button>
           );
-        })}
+        }) : Object.values(opponentFrame.nodes).map((node, index) => (
+          <div key={`${opponentFrame.teamId}-${node.slotId}`} className="opponent-node" style={{ left: `${node.position.x}%`, top: `${node.position.y}%` }} aria-hidden="true">
+            <span>{index === 0 ? "GK" : index}</span>
+          </div>
+        )))}
 
         {showLines && frame.annotations.map((annotation, index) => (
           <div key={`${frame.id}-${annotation.type}-${index}`} className={`tactical-line ${annotation.type}`} style={getAnnotationStyle(frame, annotation)} aria-hidden="true">
@@ -180,13 +197,13 @@ export function PitchStage({
           return (
             <button
               key={slotId}
-              className={`player-node ${role.group} ${focused ? "focused" : ""} ${selectedSlotId === slotId ? "selected" : ""}`}
+              className={`player-node home ${role.group} ${focused ? "focused" : ""} ${activeNodeRef.teamId === team.id && activeNodeRef.slotId === slotId ? "selected" : ""}`}
               style={{ left: `${node.position.x}%`, top: `${node.position.y}%` }}
-              onClick={() => onSelectSlot(slotId)}
-              aria-label={`查看${role.label}的职责`}
-              aria-pressed={selectedSlotId === slotId}
+              onClick={() => onSelectNode({ kind: "node", teamId: team.id, slotId })}
+              aria-label={`查看${team.name}${role.label}的职责`}
+              aria-pressed={activeNodeRef.teamId === team.id && activeNodeRef.slotId === slotId}
             >
-              <span className="player-disc">{role.short}</span><span className="player-label">{role.label}</span>
+              <span className="player-disc">{role.short}</span><span className="player-label">{opponentTeam ? `${team.code} · ` : ""}{role.label}</span>
             </button>
           );
         })}
