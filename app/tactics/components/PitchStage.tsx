@@ -118,7 +118,7 @@ export function PitchStage({
           <span><small>身后保护</small><b>{frame.metrics.protection}</b></span>
         </div>
         <div className="guidance-controls" aria-label="球员指导图层">
-          <span>指导模型 · {selectedRole.label}</span>
+          <span>指导模型 · {selectedNode.function?.label ?? selectedRole.label}</span>
           <div>
             <button onClick={onToggleVision} aria-pressed={showVision}>视角</button>
             <button onClick={onToggleDefensiveZone} aria-pressed={showDefensiveZone} disabled={!defensive}>防区</button>

@@ -98,7 +98,7 @@ export function TacticsLab() {
           <PhaseProgress frames={frames} frame={frame} phaseIndex={phaseIndex} onPhaseChange={changePhase} />
         </div>
 
-        <AnalysisPanel team={team} frame={frame} phaseIndex={phaseIndex} role={selectedRole} />
+        <AnalysisPanel team={team} frame={frame} phaseIndex={phaseIndex} role={selectedRole} roleFunction={selectedNode.function} />
       </section>
 
       <section className="principles">

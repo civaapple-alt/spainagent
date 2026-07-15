@@ -1,6 +1,45 @@
 export type TeamId = string;
 export type SlotId = string;
 export type RoleGroup = "门将" | "后卫" | "中场" | "前锋";
+export type PositionFamily =
+  | "goalkeeper"
+  | "centerBack"
+  | "fullback"
+  | "wingback"
+  | "holdingMidfielder"
+  | "centralMidfielder"
+  | "attackingMidfielder"
+  | "winger"
+  | "secondStriker"
+  | "striker";
+export type RoleArchetype =
+  | "sweeperKeeper"
+  | "buildUpGoalkeeper"
+  | "ballPlayingCenterBack"
+  | "coveringCenterBack"
+  | "aggressiveCenterBack"
+  | "wideCenterBack"
+  | "overlappingFullback"
+  | "underlappingFullback"
+  | "invertedFullback"
+  | "supportingFullback"
+  | "anchor"
+  | "deepLyingPlaymaker"
+  | "ballCarryingEight"
+  | "boxToBoxMidfielder"
+  | "mezzala"
+  | "advancedPlaymaker"
+  | "pressingTen"
+  | "wideMidfielder"
+  | "touchlineWinger"
+  | "invertedWinger"
+  | "insideForward"
+  | "falseNine"
+  | "targetForward"
+  | "pressingForward"
+  | "poacher"
+  | "secondStriker";
+export type TacticalDuty = "build" | "defend" | "cover" | "support" | "attack" | "press";
 export type TacticalStage = "buildUp" | "progression" | "attack" | "counterPress" | "defend";
 export type AnnotationType = "pass" | "run" | "press" | "cover";
 
@@ -26,16 +65,33 @@ export type RoleDefinition = {
   label: string;
   short: string;
   group: RoleGroup;
+  positionFamily: PositionFamily;
+  defaultArchetypes: RoleArchetype[];
   headline: string;
-  abilities: string[];
+  capabilities: RoleCapability[];
   responsibility: string;
   connections: string;
+};
+
+export type RoleCapability = {
+  id: string;
+  label: string;
+  level: 1 | 2 | 3 | 4 | 5;
+};
+
+export type TacticalFunction = {
+  label: string;
+  duty: TacticalDuty;
+  archetypes: RoleArchetype[];
+  behaviors: string[];
+  emphasizedCapabilities: string[];
 };
 
 export type TacticalNodeState = {
   slotId: SlotId;
   roleId: string;
   position: Position;
+  function?: TacticalFunction;
 };
 
 export type TeamFrame = {
