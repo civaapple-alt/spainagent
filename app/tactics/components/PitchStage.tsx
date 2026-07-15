@@ -71,7 +71,7 @@ export function PitchStage({
   };
 
   return (
-    <div className="pitch-stage" ref={stageRef}>
+    <div className={`pitch-stage ${opponentTeam ? "matchup-mode" : ""}`} ref={stageRef}>
       <div className="board-toolbar">
         <div className="phase-tabs" role="tablist" aria-label="攻防阶段">
           {frames.map((item, index) => (

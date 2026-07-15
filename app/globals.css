@@ -57,6 +57,17 @@ button { color: inherit; }
 .team-switcher button:hover,.team-switcher button.active { border-color:rgba(237,43,58,.65); background:rgba(237,43,58,.08); color:#eef2f7; }
 .team-switcher button.matchup-entry { border-style:dashed; }
 
+.matchup-stage-map { max-width:1500px; margin:0 auto 12px; padding:0 4vw; display:grid; grid-template-columns:minmax(150px,.85fr) repeat(5,1fr); gap:6px; }
+.matchup-stage-map > span,.matchup-stage-map button { min-height:48px; border:1px solid var(--line); background:#111a27; }
+.matchup-stage-map > span { display:flex; flex-direction:column; justify-content:center; padding:0 13px; }
+.matchup-stage-map small { color:#68778a; font:700 7px var(--font-geist-mono); letter-spacing:.07em; }
+.matchup-stage-map strong { margin-top:3px; font-size:11px; }
+.matchup-stage-map button { position:relative; color:#7d8b9e; cursor:pointer; font-size:9px; }
+.matchup-stage-map button:not(:last-child)::after { content:"→"; position:absolute; z-index:2; right:-11px; top:50%; padding:2px; transform:translateY(-50%); color:#566578; background:var(--ink); }
+.matchup-stage-map button i { color:#526176; font:700 7px var(--font-geist-mono); font-style:normal; margin-right:6px; }
+.matchup-stage-map button.active { color:white; border-color:rgba(237,43,58,.65); background:linear-gradient(110deg,rgba(237,43,58,.14),#111a27); }
+.matchup-stage-map button.active i { color:var(--red); }
+
 .workspace { max-width: 1500px; margin: 0 auto; padding: 0 4vw 68px; display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; }
 .board-column, .analysis-panel { background: var(--panel); border: 1px solid var(--line); }
 .pitch-stage { position: relative; }
@@ -166,6 +177,10 @@ button { color: inherit; }
 .player-node.away .player-disc { background:#15366d; color:#f5f8ff; border-color:#6b91d2; }.player-node.away.门将 .player-disc { background:#1b5c8d; border-color:#83c6ed; }.player-node.away.focused .player-disc { border-color:#8db9ff; box-shadow:0 0 0 4px rgba(61,123,227,.22),0 6px 17px rgba(2,9,7,.5); }.player-node.away.selected .player-disc { background:#2f70d8; color:white; border-color:white; }
 .player-label { position: absolute; top: 38px; left: 50%; transform: translateX(-50%); color: white; background: rgba(7,15,20,.82); padding: 3px 5px; font-size: 8px; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,.25); }
 .player-node:hover { filter: brightness(1.15); }
+.matchup-mode .player-node:not(.focused):not(.selected) { opacity:.42; }
+.matchup-mode .player-node:not(.focused):not(.selected) .player-label { opacity:.28; }
+.matchup-mode .player-node:hover { opacity:1; }
+.matchup-mode .player-node:hover .player-label { opacity:1; }
 .ball { position: absolute; z-index: 7; width: 14px; height: 14px; transform: translate(-50%,-50%); border: 2px solid #171c21; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,.5); transition: left .9s cubic-bezier(.2,.8,.2,1), top .9s cubic-bezier(.2,.8,.2,1); }
 .ball span { position: absolute; width: 4px; height: 4px; background: #222; border-radius: 50%; left: 3px; top: 3px; }
 .focus-halo { position: absolute; z-index: 2; width: 110px; height: 110px; border: 1px dashed rgba(255,196,0,.55); border-radius: 50%; transform: translate(-50%,-50%); transition: left .9s cubic-bezier(.2,.8,.2,1), top .9s cubic-bezier(.2,.8,.2,1); animation: pulse 2.2s infinite; }
@@ -184,6 +199,21 @@ button { color: inherit; }
 .pitch-legend span { display: flex; align-items: center; gap: 4px; color: #667589; font-size: 7px; }
 .pitch-legend i { width: 14px; height: 2px; display: inline-block; }
 .pitch-legend i.pass { background: var(--yellow); }.pitch-legend i.run { background: white; }.pitch-legend i.press { background: var(--red); }.pitch-legend i.cover { background: #66d7c1; }
+.viewing-guide { grid-column:1 / -1; display:grid; grid-template-columns:1.25fr 1fr 1.1fr 1.15fr; gap:8px; padding-top:16px; border-top:1px solid var(--line); }
+.viewing-guide > div { min-height:88px; padding:12px; border:1px solid rgba(255,255,255,.08); background:#151f2d; }
+.viewing-guide small { display:block; color:#657489; font:700 7px var(--font-geist-mono); letter-spacing:.07em; }
+.guide-question { border-left:2px solid var(--yellow)!important; }
+.guide-question strong { display:block; margin-top:8px; font-size:13px; line-height:1.5; }
+.guide-watch > div { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.guide-watch button { min-height:27px; padding:0 8px 0 5px; border:1px solid #334155; background:#101824; color:#c4ccd6; cursor:pointer; font-size:8px; }
+.guide-watch button:hover { border-color:var(--yellow); color:white; }
+.guide-watch button i { display:inline-grid; width:16px; height:16px; margin-right:5px; place-items:center; border-radius:50%; background:#293648; color:var(--yellow); font:700 7px var(--font-geist-mono); font-style:normal; }
+.guide-goals { display:grid; gap:8px; }
+.guide-goals p { margin:0; color:#8997a9; font-size:8px; line-height:1.45; }
+.guide-goals b { display:block; margin-bottom:3px; color:#dfe5ec; font-size:8px; }
+.guide-goals p:last-child b { color:#8db9ff; }
+.guide-signal strong { display:block; margin-top:7px; color:#eef2f6; font-size:9px; line-height:1.5; }
+.guide-signal span { display:block; margin-top:7px; padding-top:7px; border-top:1px solid var(--line); color:#8492a4; font-size:7px; line-height:1.5; }
 
 .analysis-panel { padding: 20px; }
 .panel-heading { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
@@ -215,10 +245,10 @@ footer { max-width:1500px; margin:0 auto; padding:25px 4vw 38px; border-top:1px 
 footer strong { color:#9ca8b7; letter-spacing:.18em; margin-right:12px; } footer p { margin:0; }
 
 @media (max-width: 1100px) {
-  .workspace { grid-template-columns:1fr; }.analysis-panel { display:grid; grid-template-columns:1fr 1fr; gap:16px; }.panel-heading,.shape-card { grid-column:1 / -1; }.coach-note { margin:0; }.role-card { grid-row:3 / span 2; }.formation-family { margin:0; }.principles { grid-template-columns:1fr 1fr; }.research-summary { grid-template-columns:1fr; }.research-matches { grid-template-columns:repeat(3,1fr); }.matchup-evidence { grid-template-columns:repeat(2,1fr); }
+  .workspace { grid-template-columns:1fr; }.analysis-panel { display:grid; grid-template-columns:1fr 1fr; gap:16px; }.panel-heading,.shape-card { grid-column:1 / -1; }.coach-note { margin:0; }.role-card { grid-row:3 / span 2; }.formation-family { margin:0; }.principles { grid-template-columns:1fr 1fr; }.research-summary { grid-template-columns:1fr; }.research-matches { grid-template-columns:repeat(3,1fr); }.matchup-evidence { grid-template-columns:repeat(2,1fr); }.viewing-guide { grid-template-columns:1fr 1fr; }
 }
 @media (max-width: 760px) {
-  .topbar { padding:0 18px; }.main-nav { display:none; }.edition { padding:7px 9px; font-size:8px; }.hero { padding:38px 18px 22px; display:block; }.hero h1 { font-size:40px; }.team-controls { margin-top:26px; min-width:0; }.team-card,.matchup-card { min-width:0; }.workspace { padding:0 12px 50px; }.board-toolbar { height:auto; min-height:58px; }.phase-tabs { max-width:calc(100vw - 170px); }.phase-tab { padding:0 10px; }.layer-button { display:none; }.pitch { min-height:0; aspect-ratio:1.45 / 1; }.attack-direction { display:none; }.live-coach { top:6%; left:6%; width:40%; padding:7px 8px; }.live-coach small { display:none; }.guidance-controls { top:5%; right:5%; padding:5px; }.guidance-controls > span { display:none; }.guidance-controls button { min-width:30px; height:22px; padding:0 5px; font-size:6px; }.pitch-metrics { left:6%; bottom:6%; }.pitch-metrics span { min-width:0; padding:4px 6px; }.pitch-metrics span:nth-child(2) { display:none; }.vision-cone { scale:.72; transform-origin:left center; }.vision-cone > span,.defensive-zone > span,.progress-corridor > span { font-size:6px; padding:2px 4px; }.defensive-zone { scale:.72; }.progress-corridor > i { height:17px; }.opponent-node { width:19px; height:19px; }.opponent-node span { font-size:6px; }.tactical-line > span { bottom:7px; padding:3px 5px; font-size:7px; }.player-disc { width:29px; height:29px; border-width:2px; }.player-label { top:32px; font-size:7px; }.focus-halo { width:72px; height:72px; }.phase-progress { grid-template-columns:1fr; gap:15px; }.pitch-legend { grid-column:1; justify-content:flex-start; margin-top:-8px; }.analysis-panel { display:block; padding:16px; }.coach-note { margin:15px 0; }.role-card { margin-top:15px; }.formation-family { margin-top:18px; }.research-summary { margin:0 18px; padding:40px 0; }.research-matches { grid-template-columns:repeat(2,1fr); }.matchup-evidence { margin:0 18px; padding:24px 0 40px; grid-template-columns:1fr; }.principles { padding:52px 18px; grid-template-columns:1fr; gap:28px; } footer { margin:0 18px; padding-left:0; padding-right:0; display:block; line-height:1.8; } footer p { margin-top:8px; }
+  .topbar { padding:0 18px; }.main-nav { display:none; }.edition { padding:7px 9px; font-size:8px; }.hero { padding:38px 18px 22px; display:block; }.hero h1 { font-size:40px; }.team-controls { margin-top:26px; min-width:0; }.team-card,.matchup-card { min-width:0; }.matchup-stage-map { margin:0 12px 10px; padding:0; grid-template-columns:repeat(5,minmax(76px,1fr)); overflow-x:auto; }.matchup-stage-map > span { display:none; }.matchup-stage-map button { min-height:42px; }.workspace { padding:0 12px 50px; }.board-toolbar { height:auto; min-height:58px; }.phase-tabs { max-width:calc(100vw - 170px); }.phase-tab { padding:0 10px; }.layer-button { display:none; }.pitch { min-height:0; aspect-ratio:1.45 / 1; }.attack-direction { display:none; }.live-coach { top:6%; left:6%; width:40%; padding:7px 8px; }.live-coach small { display:none; }.guidance-controls { top:5%; right:5%; padding:5px; }.guidance-controls > span { display:none; }.guidance-controls button { min-width:30px; height:22px; padding:0 5px; font-size:6px; }.pitch-metrics { left:6%; bottom:6%; }.pitch-metrics span { min-width:0; padding:4px 6px; }.pitch-metrics span:nth-child(2) { display:none; }.vision-cone { scale:.72; transform-origin:left center; }.vision-cone > span,.defensive-zone > span,.progress-corridor > span { font-size:6px; padding:2px 4px; }.defensive-zone { scale:.72; }.progress-corridor > i { height:17px; }.opponent-node { width:19px; height:19px; }.opponent-node span { font-size:6px; }.tactical-line > span { bottom:7px; padding:3px 5px; font-size:7px; }.player-disc { width:29px; height:29px; border-width:2px; }.player-label { top:32px; font-size:7px; }.focus-halo { width:72px; height:72px; }.phase-progress { grid-template-columns:1fr; gap:15px; }.pitch-legend { grid-column:1; justify-content:flex-start; margin-top:-8px; }.viewing-guide { grid-template-columns:1fr; }.viewing-guide > div { min-height:0; }.analysis-panel { display:block; padding:16px; }.coach-note { margin:15px 0; }.role-card { margin-top:15px; }.formation-family { margin-top:18px; }.research-summary { margin:0 18px; padding:40px 0; }.research-matches { grid-template-columns:repeat(2,1fr); }.matchup-evidence { margin:0 18px; padding:24px 0 40px; grid-template-columns:1fr; }.principles { padding:52px 18px; grid-template-columns:1fr; gap:28px; } footer { margin:0 18px; padding-left:0; padding-right:0; display:block; line-height:1.8; } footer p { margin-top:8px; }
   .coach-strip { min-height:0; padding:9px; grid-template-columns:minmax(0,1fr) auto; gap:8px; }.live-coach { width:auto; padding:2px 0 2px 9px; }.live-coach small { display:none; }.guidance-controls { padding:0; border:0; }.guidance-controls > span { display:none; }.pitch-metrics { grid-column:1 / -1; }.pitch-metrics span { flex:1; min-width:0; padding:5px 7px; }.pitch-metrics span:nth-child(2) { display:block; }
   .fullscreen-button { width:34px; padding:0; justify-content:center; }.fullscreen-button span { display:none; }.pitch-stage:fullscreen .coach-strip { top:10px; left:10px; right:10px; padding:8px; grid-template-columns:minmax(0,1fr) auto; background:rgba(8,17,25,.6); }.pitch-stage:fullscreen .pitch-metrics { display:none; }.pitch-stage:fullscreen .board-toolbar { bottom:10px; width:calc(100vw - 20px); height:50px; }.pitch-stage:fullscreen .phase-tabs { max-width:calc(100vw - 102px); justify-content:flex-start; }.pitch-stage:fullscreen .phase-tab { flex:none; }.pitch-stage:fullscreen .pitch { width:min(100vw,177.78vh); height:min(100vh,56.25vw); aspect-ratio:1.78 / 1; }.pitch-stage:fullscreen .player-disc { width:36px; height:36px; }.pitch-stage:fullscreen .player-label { top:40px; font-size:8px; }
 }

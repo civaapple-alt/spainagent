@@ -106,6 +106,19 @@ export type TacticalMetrics = {
   protection: string;
 };
 
+export type TacticalWatchTarget = NodeRef & {
+  label: string;
+};
+
+export type PhaseViewingGuide = {
+  question: string;
+  watchTargets: TacticalWatchTarget[];
+  homeGoal: string;
+  awayGoal: string;
+  successSignal: string;
+  evidence?: string;
+};
+
 export type SourceMetadata = {
   kind: "coach-model" | "match-event" | "tracking";
   label: string;
@@ -130,6 +143,7 @@ export type TacticalFrame = {
   annotations: TacticalAnnotation[];
   teams: Record<TeamId, TeamFrame>;
   attackDirections?: Record<TeamId, 1 | -1>;
+  viewingGuide?: PhaseViewingGuide;
   source: SourceMetadata;
 };
 

@@ -121,6 +121,17 @@ export function TacticsLab() {
         </div>
       </section>
 
+      {isMatchup && (
+        <nav className="matchup-stage-map" aria-label="统一的五阶段观察顺序">
+          <span><small>与单队页保持一致</small><strong>统一观察顺序</strong></span>
+          {frames.map((item, index) => (
+            <button key={item.id} className={index === phaseIndex ? "active" : ""} onClick={() => changePhase(index)}>
+              <i>{item.short}</i>{item.title}
+            </button>
+          ))}
+        </nav>
+      )}
+
       <section className="workspace" aria-label={isMatchup ? "西班牙与法国动态对抗演示" : `${team.name}动态战术演示`}>
         <div className="board-column">
           <PitchStage
@@ -148,7 +159,7 @@ export function TacticsLab() {
             onToggleDefensiveZone={() => setShowDefensiveZone((value) => !value)}
             onToggleProgressRoute={() => setShowProgressRoute((value) => !value)}
           />
-          <PhaseProgress frames={frames} frame={frame} phaseIndex={phaseIndex} onPhaseChange={changePhase} />
+          <PhaseProgress frames={frames} frame={frame} phaseIndex={phaseIndex} onPhaseChange={changePhase} onSelectNode={isMatchup ? setSelectedNodeRef : undefined} />
         </div>
 
         <AnalysisPanel team={selectedTeam} frame={frame} phaseIndex={phaseIndex} role={selectedRole} roleFunction={selectedNode.function} />
