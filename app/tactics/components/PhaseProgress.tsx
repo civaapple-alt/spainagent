@@ -1,15 +1,40 @@
-import type { NodeRef, TacticalFrame } from "../types";
+import type { TacticalFrame } from "../types";
 
 type PhaseProgressProps = {
   frames: TacticalFrame[];
   frame: TacticalFrame;
   phaseIndex: number;
   onPhaseChange: (index: number) => void;
-  onSelectNode?: (node: NodeRef) => void;
 };
 
-export function PhaseProgress({ frames, frame, phaseIndex, onPhaseChange, onSelectNode }: PhaseProgressProps) {
+export function PhaseProgress({ frames, frame, phaseIndex, onPhaseChange }: PhaseProgressProps) {
   const guide = frame.viewingGuide;
+
+  if (guide) {
+    return (
+      <div className="matchup-phase-summary" aria-label="本阶段教练判断">
+        <div className="guide-goals">
+          <p><b>西班牙要做到</b>{guide.homeGoal}</p>
+          <p><b>法国要做到</b>{guide.awayGoal}</p>
+        </div>
+        <div className="guide-signal">
+          <small>如何判断谁占优</small>
+          <strong>{guide.successSignal}</strong>
+          {guide.evidence && <span>{guide.evidence}</span>}
+        </div>
+        <details className="phase-explanation">
+          <summary>{frame.title} · 展开阶段说明</summary>
+          <p>{frame.description}</p>
+        </details>
+        <div className="pitch-legend" aria-label="战术线路图例">
+          <span><i className="pass" />传球</span>
+          <span><i className="run" />跑动</span>
+          <span><i className="press" />压迫</span>
+          <span><i className="cover" />保护</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="phase-progress" aria-label="当前战术阶段">
@@ -34,33 +59,6 @@ export function PhaseProgress({ frames, frame, phaseIndex, onPhaseChange, onSele
         <span><i className="press" />压迫</span>
         <span><i className="cover" />保护</span>
       </div>
-      {guide && (
-        <div className="viewing-guide" aria-label="本阶段观察指南">
-          <div className="guide-question">
-            <small>先看这个问题</small>
-            <strong>{guide.question}</strong>
-          </div>
-          <div className="guide-watch">
-            <small>再按顺序看位置</small>
-            <div>
-              {guide.watchTargets.map((target, index) => (
-                <button key={`${target.teamId}-${target.slotId}`} onClick={() => onSelectNode?.(target)}>
-                  <i>{index + 1}</i>{target.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="guide-goals">
-            <p><b>西班牙要做到</b>{guide.homeGoal}</p>
-            <p><b>法国要做到</b>{guide.awayGoal}</p>
-          </div>
-          <div className="guide-signal">
-            <small>如何判断谁占优</small>
-            <strong>{guide.successSignal}</strong>
-            {guide.evidence && <span>{guide.evidence}</span>}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

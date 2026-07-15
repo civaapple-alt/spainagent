@@ -148,7 +148,7 @@ export function TacticsLab() {
             onToggleDefensiveZone={() => setShowDefensiveZone((value) => !value)}
             onToggleProgressRoute={() => setShowProgressRoute((value) => !value)}
           />
-          <PhaseProgress frames={frames} frame={frame} phaseIndex={phaseIndex} onPhaseChange={changePhase} onSelectNode={isMatchup ? setSelectedNodeRef : undefined} />
+          <PhaseProgress frames={frames} frame={frame} phaseIndex={phaseIndex} onPhaseChange={changePhase} />
         </div>
 
         <AnalysisPanel team={selectedTeam} frame={frame} phaseIndex={phaseIndex} role={selectedRole} roleFunction={selectedNode.function} />

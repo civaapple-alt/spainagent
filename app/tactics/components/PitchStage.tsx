@@ -109,6 +109,25 @@ export function PitchStage({
         />
       </div>
 
+      {frame.viewingGuide && (
+        <div className="matchup-observation" aria-label="当前阶段观察重点">
+          <div className="observation-question">
+            <small>先看这个问题</small>
+            <strong>{frame.viewingGuide.question}</strong>
+          </div>
+          <div className="observation-targets">
+            <small>按顺序查看关键位置</small>
+            <div>
+              {frame.viewingGuide.watchTargets.map((target, index) => (
+                <button key={`${target.teamId}-${target.slotId}`} onClick={() => onSelectNode(target)}>
+                  <i>{index + 1}</i>{target.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="coach-strip">
         <div className="live-coach">
           <span>LIVE COACH · 0{phaseIndex + 1}</span>
