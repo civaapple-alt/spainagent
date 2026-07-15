@@ -438,21 +438,7 @@ export function TacticsLab() {
             />
           </div>
 
-          <div className={`pitch phase-${phase.id}`}>
-            <div className="pitch-grain" />
-            <div className="pitch-boundary" />
-            <div className="halfway-line" />
-            <div className="center-circle" />
-            <div className="center-dot" />
-            <div className="penalty-area left"><span /></div>
-            <div className="penalty-area right"><span /></div>
-            <div className="goal left" />
-            <div className="goal right" />
-            <div className="attack-direction">进攻方向 <b>→</b></div>
-            <div className="zone-label own">组织区</div>
-            <div className="zone-label middle">推进区</div>
-            <div className="zone-label final">终结区</div>
-
+          <div className="coach-strip">
             <div className="live-coach">
               <span>LIVE COACH · 0{phaseIndex + 1}</span>
               <strong>{phase.shape}</strong>
@@ -471,6 +457,22 @@ export function TacticsLab() {
                 <button onClick={() => setShowProgressRoute((value) => !value)} aria-pressed={showProgressRoute} disabled={!isPossessionPhase}>推进</button>
               </div>
             </div>
+          </div>
+
+          <div className={`pitch phase-${phase.id}`}>
+            <div className="pitch-grain" />
+            <div className="pitch-boundary" />
+            <div className="halfway-line" />
+            <div className="center-circle" />
+            <div className="center-dot" />
+            <div className="penalty-area left"><span /></div>
+            <div className="penalty-area right"><span /></div>
+            <div className="goal left" />
+            <div className="goal right" />
+            <div className="attack-direction">进攻方向 <b>→</b></div>
+            <div className="zone-label own">组织区</div>
+            <div className="zone-label middle">推进区</div>
+            <div className="zone-label final">终结区</div>
 
             {showVision && (
               <div className={`vision-cone ${role.group}`} style={visionStyle} aria-hidden="true">

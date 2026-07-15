@@ -90,18 +90,19 @@ button { color: inherit; }
 .zone-label { position: absolute; z-index: 1; bottom: 7%; color: rgba(255,255,255,.22); font: 600 8px var(--font-geist-mono); letter-spacing: .18em; }
 .zone-label.own { left: 16%; }.zone-label.middle { left: 47%; }.zone-label.final { right: 15%; }
 
-.live-coach { position: absolute; z-index: 8; top: 7%; left: 7%; width: min(230px, 30%); padding: 10px 12px; border-left: 2px solid var(--yellow); background: rgba(7,15,20,.78); backdrop-filter: blur(9px); box-shadow: 0 8px 24px rgba(0,0,0,.18); pointer-events: none; }
+.coach-strip { min-height: 68px; padding: 9px 14px; display: grid; grid-template-columns: minmax(250px, 1fr) auto auto; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); background: #0d1723; }
+.live-coach { min-width: 0; padding: 2px 0 2px 12px; border-left: 2px solid var(--yellow); }
 .live-coach span, .live-coach strong, .live-coach small { display: block; }
 .live-coach span { color: var(--yellow); font: 700 7px var(--font-geist-mono); letter-spacing: .14em; }
 .live-coach strong { margin-top: 5px; font: 800 12px var(--font-geist-mono); }
-.live-coach small { margin-top: 4px; color: #a8b4ad; font-size: 8px; line-height: 1.45; }
-.pitch-metrics { position: absolute; z-index: 8; left: 7%; bottom: 7%; display: flex; gap: 4px; pointer-events: none; }
-.pitch-metrics span { min-width: 55px; padding: 6px 8px; background: rgba(7,15,20,.72); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(7px); }
+.live-coach small { margin-top: 4px; color: #7f8e9f; font-size: 8px; line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pitch-metrics { display: flex; gap: 4px; }
+.pitch-metrics span { min-width: 62px; padding: 7px 9px; background: #14202e; border: 1px solid rgba(255,255,255,.09); }
 .pitch-metrics small, .pitch-metrics b { display: block; }
-.pitch-metrics small { color: #708077; font-size: 6px; margin-bottom: 3px; }
+.pitch-metrics small { color: #647387; font-size: 6px; margin-bottom: 4px; }
 .pitch-metrics b { color: #eef4ef; font: 700 9px var(--font-geist-mono); }
 
-.guidance-controls { position: absolute; z-index: 9; top: 14%; right: 6%; padding: 7px; background: rgba(7,15,20,.82); border: 1px solid rgba(255,255,255,.13); backdrop-filter: blur(8px); box-shadow: 0 6px 18px rgba(0,0,0,.2); }
+.guidance-controls { padding-left: 16px; border-left: 1px solid var(--line); }
 .guidance-controls > span { display: block; margin: 0 2px 6px; color: #93a59b; font: 700 7px var(--font-geist-mono); letter-spacing: .08em; }
 .guidance-controls > div { display: flex; gap: 3px; }
 .guidance-controls button { min-width: 36px; height: 24px; padding: 0 7px; border: 1px solid rgba(255,255,255,.11); background: #17231f; color: #718078; cursor: pointer; font: 700 7px var(--font-geist-mono); }
@@ -187,6 +188,7 @@ footer strong { color:#9ca8b7; letter-spacing:.18em; margin-right:12px; } footer
 }
 @media (max-width: 760px) {
   .topbar { padding:0 18px; }.main-nav { display:none; }.edition { padding:7px 9px; font-size:8px; }.hero { padding:38px 18px 22px; display:block; }.hero h1 { font-size:40px; }.team-card { margin-top:26px; min-width:0; }.workspace { padding:0 12px 50px; }.board-toolbar { height:auto; min-height:58px; }.phase-tabs { max-width:calc(100vw - 170px); }.phase-tab { padding:0 10px; }.layer-button { display:none; }.pitch { min-height:0; aspect-ratio:1.45 / 1; }.attack-direction { display:none; }.live-coach { top:6%; left:6%; width:40%; padding:7px 8px; }.live-coach small { display:none; }.guidance-controls { top:5%; right:5%; padding:5px; }.guidance-controls > span { display:none; }.guidance-controls button { min-width:30px; height:22px; padding:0 5px; font-size:6px; }.pitch-metrics { left:6%; bottom:6%; }.pitch-metrics span { min-width:0; padding:4px 6px; }.pitch-metrics span:nth-child(2) { display:none; }.vision-cone { scale:.72; transform-origin:left center; }.vision-cone > span,.defensive-zone > span,.progress-corridor > span { font-size:6px; padding:2px 4px; }.defensive-zone { scale:.72; }.progress-corridor > i { height:17px; }.opponent-node { width:19px; height:19px; }.opponent-node span { font-size:6px; }.tactical-line > span { bottom:7px; padding:3px 5px; font-size:7px; }.player-disc { width:29px; height:29px; border-width:2px; }.player-label { top:32px; font-size:7px; }.focus-halo { width:72px; height:72px; }.phase-progress { grid-template-columns:1fr; gap:15px; }.pitch-legend { grid-column:1; justify-content:flex-start; margin-top:-8px; }.analysis-panel { display:block; padding:16px; }.coach-note { margin:15px 0; }.role-card { margin-top:15px; }.formation-family { margin-top:18px; }.principles { padding:52px 18px; grid-template-columns:1fr; gap:28px; } footer { margin:0 18px; padding-left:0; padding-right:0; display:block; line-height:1.8; } footer p { margin-top:8px; }
+  .coach-strip { min-height:0; padding:9px; grid-template-columns:minmax(0,1fr) auto; gap:8px; }.live-coach { width:auto; padding:2px 0 2px 9px; }.live-coach small { display:none; }.guidance-controls { padding:0; border:0; }.guidance-controls > span { display:none; }.pitch-metrics { grid-column:1 / -1; }.pitch-metrics span { flex:1; min-width:0; padding:5px 7px; }.pitch-metrics span:nth-child(2) { display:block; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; }
