@@ -112,7 +112,7 @@ export function TacticsLab() {
           )}
           <div className="team-switcher" aria-label="切换已完成研究的球队">
             {readyTeams.map((entry) => (
-              <button key={entry.id} className={entry.id === team.id ? "active" : ""} onClick={() => changeTeam(entry.id)} aria-pressed={entry.id === team.id}>
+              <button key={entry.id} className={!isMatchup && entry.id === team.id ? "active" : ""} onClick={() => changeTeam(entry.id)} aria-pressed={!isMatchup && entry.id === team.id}>
                 {entry.code} · {entry.name}
               </button>
             ))}
